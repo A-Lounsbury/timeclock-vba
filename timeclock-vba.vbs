@@ -1,4 +1,4 @@
-' timeclock-vba.vbs
+' timeclock.vbs
 ' Author: Andrew Lounsbury
 ' Date: 3/7/24
 ' Description: a simple time clock for keeping tract of hours worked
@@ -112,20 +112,14 @@ Sub computeTotal():
     ' UNFINISHED; computes the total number of hours worked
     Dim i As Integer
     Dim total As Double
-    Debug.Print ("TYPE: " & VarType(total))
-    Dim hr
-    hr = Minute(total)
-    Debug.Print ("mins: " & hr)
-    Debug.Print ("total: " & total)
-    Debug.Print ("dbl total: " & CDbl(total))
     i = 2
-    Dim Add As Double
     Do While Not IsEmpty(Range("B" & i).Value)
-        Debug.Print ("ADDING: " & CDbl(Minute(Range("E" & i).Value)) - CDbl(Minute(Range("B" & i).Value)))
-        total = total + CDbl(DateDiff("n", Minute(Range("B" & i).Value), Minute(Range("E" & i).Value)))
+        total = total + DateDiff("h", Range("B" & i).Value, Range("E" & i).Value)
         i = i + 1
     Loop
-    Debug.Print ("TYPE AGAIN: " & VarType(total))
-    Range("G" & 2).Value = CDbl(total)
-    Range("H" & 2).Value = "PLACEHOLDER 2"
+    
+    Range("G2").NumberFormat = "General"
+    Range("H2").NumberFormat = "General"
+    Range("G2") = total
+    Range("H2") = 2080 - total
 End Sub
