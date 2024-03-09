@@ -1,6 +1,6 @@
-' timeclock.vbs
+' timeclock-vba.vbs
 ' Author: Andrew W. Lounsbury
-' Date: 3/7/24
+' Date: 3/9/24
 ' Description: a simple time clock for keeping tract of hours worked
 
 Sub startShift():
@@ -109,33 +109,67 @@ Sub endShift():
 End Sub
 
 Sub computeTotal():
-    ' computes the total number of hours worked
+    ' computes the total number of hours worked and the difference between the expected number of hours and displays them in the appropriate cells
+    Dim differenceHours As Integer
+    Dim differenceMinutes As Integer
     Dim i As Integer
-    Dim total As Double
     Dim numDays As Integer
-    Dim expectedHours
+    Dim totalHours As Integer
+    Dim totalMinutes As Integer
+    Dim remainingMinutes As Integer
     expectedHours = -1
     numDays = 0
+    total = 0
     i = 2
     Do While Not IsEmpty(Range("B" & i).Value)
         ' Adding the length of time from the start of the shift to the end of the shift, subtracting the time spent at lunch
-        total = total + DateDiff("h", Range("B" & i).Value, Range("E" & i).Value) - DateDiff("h", Range("C" & i).Value, Range("D" & i).Value)
+        totalMinutes = totalMinutes + DateDiff("n", Range("B" & i).Value, Range("E" & i).Value) - DateDiff("n", Range("C" & i).Value, Range("D" & i).Value)
         numDays = numDays + 1
         i = i + 1
     Loop
+    ' converting the total number of minutes to hours and minutes
+    totalHours = Int(totalMinutes / 60)
+    remainingMinutes = totalMinutes Mod 60
     expectedHours = numDays * 8
     
+    ' formatting the cells
     Range("G2").NumberFormat = "General"
     Range("H2").NumberFormat = "General"
     Range("I2").NumberFormat = "General"
-    Range("G2") = total
-    Range("H2") = expectedHours
-    Range("I2") = total - expectedHours
-    If Range("I2").Value < 0 Then
-        Range("I2").Interior.Color = RGB(255, 128, 128)
-    ElseIf Range("I2").Value > 0 Then
-        Range("I2").Interior.Color = RGB(51, 153, 102)
+    
+    ' inserting output into cells
+    If remainingMinutes <> 0 Then
+        Range("G2") = totalHours & "hr " & remainingMinutes & "min"
+    Else
+        Range("G2") = totalHours & "hr"
+    End If
+    Range("H2") = expectedHours & "hr"
+    
+    differenceMinutes = totalMinutes - (expectedHours * 60)
+    If Abs(differenceMinutes) > 60 Then
+        differenceHours = Int((totalHours - expectedHours) / 60)
+    Else
+        differenceHours = 0
+    End If
+    
+    If Int(differenceMinutes / 60) <> 0 Then
+        If differenceMinutes < 0 Then
+            Range("I2") = CInt(differenceMinutes / 60) & "hr " & Abs(differenceMinutes Mod 60) & "min"
+        ElseIf differenceMinutes > 0 Then
+            Range("I2") = CInt(differenceMinutes / 60) & "hr " & differenceMinutes Mod 60 & "min"
+        Else ' just hours, no extra minutes
+            Range("I2") = CInt(differenceMinutes / 60) & "hr"
+        End If
+    Else ' just minutes
+        Range("I2") = differenceMinutes & "min"
+    End If
+    
+    ' Coloring cell I2 according to its value
+    If differenceMinutes < 0 Then
+        Range("I2").Interior.Color = RGB(255, 128, 128) ' red
+    ElseIf differenceMinutes > 0 Then
+        Range("I2").Interior.Color = RGB(51, 153, 102) 'green
     Else ' on track
-        Range("I2").Interior.ColorIndex = 6
+        Range("I2").Interior.ColorIndex = 6 'yellow
     End If
 End Sub

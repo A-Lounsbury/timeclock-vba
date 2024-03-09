@@ -1,8 +1,11 @@
 # timeclock-vba
 A time clock for keeping track of hours worked in VBA Excel. 
 
-![lower than expected](images/image1.png)
+Less time logged than expected:
+![less than expected](images/image1.png)
 
+Logged time equals expected time: 
 ![at expected hours](images/image2.png)
 
+More time logged than expected
 ![more than expected](images/image3.png)
