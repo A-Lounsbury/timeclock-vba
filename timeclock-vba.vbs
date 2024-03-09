@@ -118,7 +118,8 @@ Sub computeTotal():
     numDays = 0
     i = 2
     Do While Not IsEmpty(Range("B" & i).Value)
-        total = total + DateDiff("h", Range("B" & i).Value, Range("E" & i).Value)
+        ' Adding the length of time from the start of the shift to the end of the shift, subtracting the time spent at lunch
+        total = total + DateDiff("h", Range("B" & i).Value, Range("E" & i).Value) - DateDiff("h", Range("C" & i).Value, Range("D" & i).Value)
         numDays = numDays + 1
         i = i + 1
     Loop
