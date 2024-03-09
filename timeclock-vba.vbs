@@ -1,5 +1,5 @@
 ' timeclock.vbs
-' Author: Andrew Lounsbury
+' Author: Andrew W. Lounsbury
 ' Date: 3/7/24
 ' Description: a simple time clock for keeping tract of hours worked
 
@@ -109,17 +109,32 @@ Sub endShift():
 End Sub
 
 Sub computeTotal():
-    ' UNFINISHED; computes the total number of hours worked
+    ' computes the total number of hours worked
     Dim i As Integer
     Dim total As Double
+    Dim numDays As Integer
+    Dim expectedHours
+    expectedHours = -1
+    numDays = 0
     i = 2
     Do While Not IsEmpty(Range("B" & i).Value)
         total = total + DateDiff("h", Range("B" & i).Value, Range("E" & i).Value)
+        numDays = numDays + 1
         i = i + 1
     Loop
+    expectedHours = numDays * 8
     
     Range("G2").NumberFormat = "General"
     Range("H2").NumberFormat = "General"
+    Range("I2").NumberFormat = "General"
     Range("G2") = total
-    Range("H2") = 2080 - total
+    Range("H2") = expectedHours
+    Range("I2") = total - expectedHours
+    If Range("I2").Value < 0 Then
+        Range("I2").Interior.Color = RGB(255, 128, 128)
+    ElseIf Range("I2").Value > 0 Then
+        Range("I2").Interior.Color = RGB(51, 153, 102)
+    Else ' on track
+        Range("I2").Interior.ColorIndex = 6
+    End If
 End Sub
