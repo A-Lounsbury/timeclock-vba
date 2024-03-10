@@ -1,6 +1,6 @@
-' timeclock-vba.vbs
+' timeclock.vbs
 ' Author: Andrew W. Lounsbury
-' Date: 3/9/24
+' Date: 3/10/24
 ' Description: a simple time clock for keeping tract of hours worked
 
 Sub startShift():
@@ -8,9 +8,9 @@ Sub startShift():
     '
     ' insert the date into the first empty cell in column A
     ' getting the first empty cell in column A
-    Dim Index As Integer
-    Dim i As Integer
     Dim emptyCellFound As Boolean
+    Dim i As Integer
+    Dim Index As Integer
     Index = -1
     i = 2
     emptyCellFound = False
@@ -36,11 +36,11 @@ End Sub
 Sub startLunch():
     ' Inserts the current time in the appropriate cell in column C
     '
-    ' insert the date into the first empty cell in column A
+    ' inserting the date into the first empty cell in column A
     ' getting the first empty cell in column A
-    Dim Index As Integer
-    Dim i As Integer
     Dim emptyCellFound As Boolean
+    Dim i As Integer
+    Dim Index As Integer
     Index = -1
     i = 2
     emptyCellFound = False
@@ -52,10 +52,14 @@ Sub startLunch():
         i = i + 1
     Loop
     
-    ' inserting the time into the empty cell in column B
-    Dim t As Date
-    t = Time()
-    Range("C" & Index) = t
+    If IsEmpty(Range("B" & i).Value) Then
+        MsgBox ("Error: cannot start lunch before starting shift")
+    Else
+        ' inserting the time into the empty cell in column B
+        Dim t As Date
+        t = Time()
+        Range("C" & Index) = t
+    End If
 End Sub
 
 Sub endLunch():
@@ -63,9 +67,9 @@ Sub endLunch():
     '
     ' inserting the date into the first empty cell in column A
     ' getting the first empty cell in column A
-    Dim Index As Integer
-    Dim i As Integer
     Dim emptyCellFound As Boolean
+    Dim i As Integer
+    Dim Index As Integer
     Index = -1
     i = 2
     emptyCellFound = False
@@ -77,10 +81,16 @@ Sub endLunch():
         i = i + 1
     Loop
     
-    ' inserting the time into the empty cell in column B
-    Dim t As Date
-    t = Time()
-    Range("D" & Index) = t
+    If IsEmpty(Range("B" & i).Value) Then
+        MsgBox ("Error: cannot end lunch before starting shift")
+    ElseIf IsEmpty(Range("C" & i).Value) Then
+        MsgBox ("Error: cannot end lunch before starting lunch")
+    Else
+        ' inserting the time into the empty cell in column B
+        Dim t As Date
+        t = Time()
+        Range("D" & Index) = t
+    End If
 End Sub
 
 Sub endShift():
@@ -88,9 +98,9 @@ Sub endShift():
     '
     ' inserting the date into the first empty cell in column A
     ' getting the first empty cell in column A
-    Dim Index As Integer
-    Dim i As Integer
     Dim emptyCellFound As Boolean
+    Dim i As Integer
+    Dim Index As Integer
     Index = -1
     i = 2
     emptyCellFound = False
@@ -102,10 +112,18 @@ Sub endShift():
         i = i + 1
     Loop
     
-    ' inserting the time into the empty cell in column B
-    Dim t As Date
-    t = Time()
-    Range("E" & Index) = t
+    If IsEmpty(Range("B" & i).Value) Then
+        MsgBox ("Error: cannot end shift before starting shift")
+    ElseIf IsEmpty(Range("C" & i).Value) Then
+        MsgBox ("Error: cannot end shift before starting lunch")
+    ElseIf IsEmpty(Range("D" & i).Value) Then
+        MsgBox ("Error: cannot end shift before ending lunch")
+    Else
+        ' inserting the time into the empty cell in column B
+        Dim t As Date
+        t = Time()
+        Range("E" & Index) = t
+    Else
 End Sub
 
 Sub computeTotal():
