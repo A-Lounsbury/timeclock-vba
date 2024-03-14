@@ -52,7 +52,7 @@ Sub startLunch():
         i = i + 1
     Loop
     
-    If IsEmpty(Range("B" & i).Value) Then
+    If IsEmpty(Range("B" & Index).Value) Then
         MsgBox ("Error: cannot start lunch before starting shift")
     Else
         ' inserting the time into the empty cell in column B
@@ -70,6 +70,8 @@ Sub endLunch():
     Dim emptyCellFound As Boolean
     Dim i As Integer
     Dim Index As Integer
+    Dim morningStretch As Integer
+    Dim targetEndShift As Date
     Index = -1
     i = 2
     emptyCellFound = False
@@ -81,16 +83,27 @@ Sub endLunch():
         i = i + 1
     Loop
     
-    If IsEmpty(Range("B" & i).Value) Then
+    If IsEmpty(Range("B" & Index).Value) Then
         MsgBox ("Error: cannot end lunch before starting shift")
-    ElseIf IsEmpty(Range("C" & i).Value) Then
+    ElseIf IsEmpty(Range("C" & Index).Value) Then
         MsgBox ("Error: cannot end lunch before starting lunch")
     Else
         ' inserting the time into the empty cell in column B
         Dim t As Date
         t = Time()
         Range("D" & Index) = t
+        
+        Dim shiftStart As Date
+        shiftStart = Range("B" & i).Value
+        Dim lunchStart As Date
+        lunchStart = Range("C" & i).Value
+        
+        morningStretch = DateDiff("n", Range("B" & i).Value, Range("C" & i).Value)
+        Debug.Print ("morningStretch: " & morningStretch)
+        
+        MsgBox ("Target Shift End: " & targetShiftEnd)
     End If
+    
 End Sub
 
 Sub endShift():
@@ -112,18 +125,18 @@ Sub endShift():
         i = i + 1
     Loop
     
-    If IsEmpty(Range("B" & i).Value) Then
+    If IsEmpty(Range("B" & Index).Value) Then
         MsgBox ("Error: cannot end shift before starting shift")
-    ElseIf IsEmpty(Range("C" & i).Value) Then
+    ElseIf IsEmpty(Range("C" & Index).Value) Then
         MsgBox ("Error: cannot end shift before starting lunch")
-    ElseIf IsEmpty(Range("D" & i).Value) Then
+    ElseIf IsEmpty(Range("D" & Index).Value) Then
         MsgBox ("Error: cannot end shift before ending lunch")
     Else
         ' inserting the time into the empty cell in column B
         Dim t As Date
         t = Time()
         Range("E" & Index) = t
-    Else
+    End If
 End Sub
 
 Sub computeTotal():
@@ -157,7 +170,11 @@ Sub computeTotal():
     
     ' inserting output into cells
     If remainingMinutes <> 0 Then
-        Range("G2") = totalHours & "hr " & remainingMinutes & "min"
+        If totalHours <> 0 Then
+            Range("G2") = totalHours & "hr " & remainingMinutes & "min"
+        Else
+            Range("G2") = remainingMinutes & "min"
+        End If
     Else
         Range("G2") = totalHours & "hr"
     End If
@@ -170,13 +187,19 @@ Sub computeTotal():
         differenceHours = 0
     End If
     
+    If differenceMinutes >= 60 Then
+        differenceHours = CInt(differenceMinutes / 60)
+    ElseIf differenceMinutes < 60 Then
+        differenceHours = -7
+    End If
+    
     If Int(differenceMinutes / 60) <> 0 Then
         If differenceMinutes < 0 Then
-            Range("I2") = CInt(differenceMinutes / 60) & "hr " & Abs(differenceMinutes Mod 60) & "min"
+            Range("I2") = differenceHours & "hr " & Abs(differenceMinutes Mod 60) & "min"
         ElseIf differenceMinutes > 0 Then
-            Range("I2") = CInt(differenceMinutes / 60) & "hr " & differenceMinutes Mod 60 & "min"
+            Range("I2") = differenceHours & "hr " & differenceMinutes Mod 60 & "min"
         Else ' just hours, no extra minutes
-            Range("I2") = CInt(differenceMinutes / 60) & "hr"
+            Range("I2") = differenceHours & "hr"
         End If
     Else ' just minutes
         Range("I2") = differenceMinutes & "min"
