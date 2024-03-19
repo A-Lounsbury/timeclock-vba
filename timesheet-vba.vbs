@@ -1,6 +1,6 @@
-' timeclock.vbs
+' timesheet.vbs
 ' Author: Andrew W. Lounsbury
-' Date: 3/10/24
+' Date: 3/19/24
 ' Description: a simple time clock for keeping tract of hours worked
 
 Sub startShift():
