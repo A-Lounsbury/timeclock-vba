@@ -1,4 +1,4 @@
-# timeclock-vba
+# timesheet-vba
 A time sheet for keeping track of hours worked in VBA Excel. 
 
 Less time logged than expected:
