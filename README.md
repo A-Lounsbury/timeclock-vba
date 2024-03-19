@@ -1,5 +1,5 @@
 # timeclock-vba
-A time clock for keeping track of hours worked in VBA Excel. 
+A time sheet for keeping track of hours worked in VBA Excel. 
 
 Less time logged than expected:
 ![less than expected](images/image1.png)
