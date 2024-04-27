@@ -1,7 +1,7 @@
 ' timesheet.vbs
 ' Author: Andrew W. Lounsbury
 ' Date: 3/19/24
-' Description: a simple time clock for keeping tract of hours worked
+' Description: a simple time clock for keeping track of hours worked
 
 Sub startShift():
     ' Inserts the current date and the current time in the appropriate cells in columns A and B
@@ -98,8 +98,30 @@ Sub endLunch():
         Dim lunchStart As Date
         lunchStart = Range("C" & i).Value
         
-        morningStretch = DateDiff("n", Range("B" & i).Value, Range("C" & i).Value)
+        morningStretch = DateDiff("n", Range("B" & Index).Value, Range("C" & Index).Value)
         Debug.Print ("morningStretch: " & morningStretch)
+        
+        Dim timeLeft As Integer
+        Dim hoursLeft As Double
+        Dim minutesLeft As Integer
+        timeLeft = Range("B" & Index).Value + ((8 * 60) - morningStretch)
+        Debug.Print ("timeLeft: " & timeLeft)
+        hoursLeft = CInt(timeLeft / 60)
+        minutesLeft = timeLeft Mod 60
+        
+        Dim newHours As Integer
+        Dim newMinutes As Integer
+        Dim seconds As Integer
+        Dim oldHours As Integer
+        Dim oldMinutes As Integer
+        
+        oldHours = Hour(Range("D" & Index).Value)
+        oldMinutes = Minute(Range("D" & Index).Value)
+        seconds = Second(Range("D" & Index).Value)
+        newHours = oldHours + hoursLeft
+        newMinutes = oldMinutes + minutesLeft
+        
+        targetShiftEnd = newHours & ":" & newMinutes & ":" & seconds & " PM"
         
         MsgBox ("Target Shift End: " & targetShiftEnd)
     End If
@@ -159,9 +181,23 @@ Sub computeTotal():
         i = i + 1
     Loop
     ' converting the total number of minutes to hours and minutes
+    Debug.Print (totalMinutes)
     totalHours = Int(totalMinutes / 60)
     remainingMinutes = totalMinutes Mod 60
     expectedHours = numDays * 8
+    expectedMinutes = expectedHours * 60
+    
+    differenceMinutes = totalMinutes - expectedMinutes
+    Debug.Print ("differenceMinutes: " & differenceMinutes)
+    
+    If Abs(differenceMinutes) >= 60 Then
+        diffHours = CInt(differenceMinutes / 60)
+    Else
+        diffHours = 0
+    End If
+    diffMinutes = differenceMinutes Mod 60
+    Debug.Print ("diffHours: " & diffHours)
+    Debug.Print ("diffMinutes: " & diffMinutes)
     
     ' formatting the cells
     Range("G2").NumberFormat = "General"
@@ -193,16 +229,17 @@ Sub computeTotal():
         differenceHours = -7
     End If
     
-    If Int(differenceMinutes / 60) <> 0 Then
-        If differenceMinutes < 0 Then
-            Range("I2") = differenceHours & "hr " & Abs(differenceMinutes Mod 60) & "min"
-        ElseIf differenceMinutes > 0 Then
-            Range("I2") = differenceHours & "hr " & differenceMinutes Mod 60 & "min"
+    ' Entering Difference column
+    If diffHours <> 0 Then
+        If diffMinutes < 0 Then
+            Range("I2") = diffHours & "hr " & Abs(diffMinutes Mod 60) & "min"
+        ElseIf diffMinutes > 0 Then
+            Range("I2") = diffHours & "hr " & diffMinutes Mod 60 & "min"
         Else ' just hours, no extra minutes
-            Range("I2") = differenceHours & "hr"
+            Range("I2") = diffHours & "hr"
         End If
     Else ' just minutes
-        Range("I2") = differenceMinutes & "min"
+        Range("I2") = diffMinutes & "min"
     End If
     
     ' Coloring cell I2 according to its value
