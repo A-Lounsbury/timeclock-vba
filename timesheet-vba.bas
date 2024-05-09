@@ -1,7 +1,7 @@
-' timesheet.vbs
+' timesheet.bas
 ' Author: Andrew W. Lounsbury
 ' Date: 3/19/24
-' Description: a simple time clock for keeping track of hours worked
+' Description: a simple time sheet for keeping track of hours worked
 
 Sub startShift():
     ' Inserts the current date and the current time in the appropriate cells in columns A and B
@@ -200,21 +200,21 @@ Sub computeTotal():
     Debug.Print ("diffMinutes: " & diffMinutes)
     
     ' formatting the cells
-    Range("G2").NumberFormat = "General"
     Range("H2").NumberFormat = "General"
     Range("I2").NumberFormat = "General"
+    Range("J2").NumberFormat = "General"
     
     ' inserting output into cells
     If remainingMinutes <> 0 Then
         If totalHours <> 0 Then
-            Range("G2") = totalHours & "hr " & remainingMinutes & "min"
+            Range("H2") = totalHours & "hr " & remainingMinutes & "min"
         Else
-            Range("G2") = remainingMinutes & "min"
+            Range("H2") = remainingMinutes & "min"
         End If
     Else
-        Range("G2") = totalHours & "hr"
+        Range("H2") = totalHours & "hr"
     End If
-    Range("H2") = expectedHours & "hr"
+    Range("I2") = expectedHours & "hr"
     
     differenceMinutes = totalMinutes - (expectedHours * 60)
     If Abs(differenceMinutes) > 60 Then
@@ -232,22 +232,50 @@ Sub computeTotal():
     ' Entering Difference column
     If diffHours <> 0 Then
         If diffMinutes < 0 Then
-            Range("I2") = diffHours & "hr " & Abs(diffMinutes Mod 60) & "min"
+            Range("J2") = diffHours & "hr " & Abs(diffMinutes Mod 60) & "min"
         ElseIf diffMinutes > 0 Then
-            Range("I2") = diffHours & "hr " & diffMinutes Mod 60 & "min"
+            Range("J2") = diffHours & "hr " & diffMinutes Mod 60 & "min"
         Else ' just hours, no extra minutes
             Range("I2") = diffHours & "hr"
         End If
     Else ' just minutes
-        Range("I2") = diffMinutes & "min"
+        Range("J2") = diffMinutes & "min"
     End If
     
     ' Coloring cell I2 according to its value
     If differenceMinutes < 0 Then
-        Range("I2").Interior.Color = RGB(255, 128, 128) ' red
+        Range("J2").Interior.Color = RGB(255, 128, 128) ' red
     ElseIf differenceMinutes > 0 Then
-        Range("I2").Interior.Color = RGB(51, 153, 102) 'green
+        Range("J2").Interior.Color = RGB(51, 153, 102) 'green
     Else ' on track
-        Range("I2").Interior.ColorIndex = 6 'yellow
+        Range("J2").Interior.ColorIndex = 6 'yellow
+    End If
+End Sub
+
+Sub showElapsedTime()
+    ' computes the time elapsed since the start of the shift
+    ' getting the first empty cell in column B
+    Dim emptyCellFound As Boolean
+    Dim i As Integer
+    Dim Index As Integer
+    Index = -1
+    i = 2
+    emptyCellFound = False
+    Do While Not emptyCellFound
+        If IsEmpty(Range("B" & i).Value) Then
+            Index = i
+            emptyCellFound = True
+        End If
+        i = i + 1
+    Loop
+    ' We want the index of the last nonempty cell, not the first empty cell.
+    Index = Index - 1
+    ' getting the time when the shift started and lunch times if available
+    startShift = Range("B" & Index).Value
+    If Not IsEmpty(Range("C" & Index).Value) Then
+        lunchStart = Range("C" & Index).Value
+    End If
+    If Not IsEmpty(Range("D" & Index).Value) Then
+        lunchEnd = Range("D" & Index).Value
     End If
 End Sub
