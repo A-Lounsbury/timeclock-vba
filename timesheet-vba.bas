@@ -252,12 +252,16 @@ Sub computeTotal():
     End If
 End Sub
 
-Sub showElapsedTime()
+Sub showElapsedTime():
     ' computes the time elapsed since the start of the shift
     ' getting the first empty cell in column B
     Dim emptyCellFound As Boolean
     Dim i As Integer
     Dim Index As Integer
+    Dim startShift As Date
+    Dim lunchDuration As Integer
+    Dim lunchStart As Integer
+    Dim lunchEnd As Integer
     Index = -1
     i = 2
     emptyCellFound = False
@@ -269,13 +273,7 @@ Sub showElapsedTime()
         i = i + 1
     Loop
     ' We want the index of the last nonempty cell, not the first empty cell.
-    Index = Index - 1
-    ' getting the time when the shift started and lunch times if available
-    startShift = Range("B" & Index).Value
-    If Not IsEmpty(Range("C" & Index).Value) Then
-        lunchStart = Range("C" & Index).Value
-    End If
-    If Not IsEmpty(Range("D" & Index).Value) Then
-        lunchEnd = Range("D" & Index).Value
-    End If
+    curTime = Time
+    elapsedTime = DateDiff("n", Range("B" & Index).Value, currentTime - DateDiff("n", Range("C" & i).Value, Range("D" & i).Value))
+    MsgBox ("Elapsed Time: " & elapsedTime)
 End Sub
